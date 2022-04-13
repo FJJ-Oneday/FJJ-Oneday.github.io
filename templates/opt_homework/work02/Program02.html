@@ -1,0 +1,1059 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Untitled333</title><meta name="generator" content="MATLAB 9.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-04-13"><meta name="DC.source" content="Untitled333.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Numerical Optimization</a></li><li><a href="#2">compare the performance with Matlab build-in function</a></li></ul></div><h2 id="1">Numerical Optimization</h2><p><b>Name: Fan Jiajun,  Student number: 19020211153389</b></p><p><i>1, by the output results, it suggested that two methods can both find optimal solution while solution existed.</i></p><p><i>2, it showed that interior point method is better than simplex method by comparing time spent between the two methods. It also suggested that optimal values is almostly equivalent.</i></p><pre class="codeinput">clc; close <span class="string">all</span>; clearvars;
+
+studentnumber = 1153389;
+
+m = 10; n = 20;
+num = 100;
+
+params.verbose = 1;
+params.OutputGap = 10;
+params.Max_Iteration = 100;
+params.Tolerance = 1e-7;
+params.Decomposition = <span class="string">"qr"</span>;
+
+num_of_empty_feasible_set = 0;
+num_of_unbounded = 0;
+num_of_solution_exist = 0;
+
+case0 = 0; case1 = 0; case2 = 0;
+case3 = 0; case4 = 0; case5 = 0;
+
+<span class="keyword">for</span> i = 1 : num
+    seed = studentnumber + i;
+    rng(seed);
+
+    x = rand(n, 1); A = randn(m, n);
+    b = randn(m, 1); c = randn(n, 1);
+    [~, info] = LinProgIP(c, A, b, params);
+    [~, fval, exitflag, ~] = linprog(c, [], [], A, b, zeros(1, n), []);
+
+    <span class="keyword">switch</span> exitflag
+        <span class="keyword">case</span> 1
+            num_of_solution_exist = num_of_solution_exist + 1;
+        <span class="keyword">case</span> -2
+            num_of_empty_feasible_set = num_of_empty_feasible_set  + 1;
+        <span class="keyword">case</span> -3
+            num_of_unbounded = num_of_unbounded + 1;
+    <span class="keyword">end</span>
+
+    <span class="keyword">switch</span> info.status
+        <span class="keyword">case</span> 0
+            case0 = case0 + 1;
+        <span class="keyword">case</span> 1
+            case1 = case1 + 1;
+        <span class="keyword">case</span> 2
+            case2 = case2 + 1;
+        <span class="keyword">case</span> 3
+            case3 = case3 + 1;
+        <span class="keyword">case</span> 4
+            case4 = case4 + 1;
+        <span class="keyword">case</span> 5
+            case5 = case5 + 1;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+fprintf(<span class="string">"The number of optimal solution founded: %d\n"</span>, num_of_solution_exist);
+fprintf(<span class="string">"The number of feasible empty set:       %d\n"</span>, num_of_empty_feasible_set);
+fprintf(<span class="string">"The number of solution unbounded:       %d\n"</span>, num_of_unbounded);
+fprintf(<span class="string">"-----------------------------------------\n"</span>);
+
+fprintf(<span class="string">"The number of optimal solution founded:   %d\n"</span>, case0);
+fprintf(<span class="string">"The number of max iteration reached:      %d\n"</span>, case1);
+fprintf(<span class="string">"The number of optimal solution unbounded: %d\n"</span>, case2);
+fprintf(<span class="string">"The number of prime resifule increased:   %d\n"</span>, case3);
+fprintf(<span class="string">"The number of dual resifule increased:    %d\n"</span>, case4);
+fprintf(<span class="string">"The number of ill-conditioned:            %d\n"</span>, case5);
+
+<span class="comment">% fprintf("=============================================\n");</span>
+<span class="comment">% fprintf("       Record of function results            \n");</span>
+<span class="comment">% fprintf("=============================================\n");</span>
+<span class="comment">% fprintf("amount of empty feasible set: %d\n", num_of_empty_feasible_set);</span>
+<span class="comment">% fprintf("amount of unbounded         : %d\n", num_of_unbounded);</span>
+<span class="comment">% fprintf("amount of solution exists   : %d\n", num_of_solution_exist);</span>
+<span class="comment">% fprintf("=============================================\n");</span>
+</pre><pre class="codeoutput">iter:0,f:3.174e+00,|rb|:1.569e+01,|rc|:1.455e+01
+prime residule increases
+iter:6,f:-1.387e+10,mu:1.289e+02,|rb|:1.495e-05,|rc|:2.150e+00,ComTime:6.941e-02
+
+Problem is unbounded.
+
+iter:0,f:-4.991e-01,|rb|:2.154e+01,|rc|:1.579e+01
+dual residule increases
+iter:6,f:5.699e+00,mu:1.313e+02,|rb|:2.120e+00,|rc|:1.782e-07,ComTime:3.613e-03
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-5.494e+00,|rb|:1.977e+01,|rc|:1.418e+01
+dual residule increases
+iter:6,f:-2.412e-02,mu:8.959e+01,|rb|:3.236e+00,|rc|:1.356e-07,ComTime:8.433e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-2.074e+00,|rb|:6.303e+00,|rc|:1.106e+01
+prime residule increases
+iter:6,f:-1.288e+10,mu:5.404e+03,|rb|:5.299e-06,|rc|:3.146e+00,ComTime:1.173e-03
+
+Problem is unbounded.
+
+iter:0,f:1.071e+00,|rb|:1.445e+01,|rc|:8.412e+00
+dual residule increases
+iter:7,f:-4.698e-01,mu:3.055e+04,|rb|:3.789e+00,|rc|:8.549e-03,ComTime:2.748e-03
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-1.538e+00,|rb|:6.793e+00,|rc|:1.334e+01
+dual residule increases
+iter:7,f:-1.194e+00,mu:2.516e+04,|rb|:1.824e+00,|rc|:3.497e-06,ComTime:8.355e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:3.391e+00,|rb|:1.002e+01,|rc|:6.503e+00
+dual residule increases
+iter:7,f:8.777e-01,mu:2.838e+03,|rb|:1.450e+00,|rc|:1.179e-02,ComTime:4.959e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:3.708e+00,|rb|:5.689e+00,|rc|:1.689e+01
+prime residule increases
+iter:7,f:-8.164e+12,mu:9.579e+04,|rb|:1.315e-03,|rc|:3.398e+00,ComTime:4.590e-04
+
+Problem is unbounded.
+
+iter:0,f:-2.313e+00,|rb|:2.125e+01,|rc|:2.187e+01
+success
+iter:10,f:-3.477e+00,mu:1.133e-09,|rb|:1.626e-12,|rc|:6.680e-15,ComTime:8.375e-04
+
+Optimal solution found.
+
+iter:0,f:4.817e+00,|rb|:9.611e+00,|rc|:1.385e+01
+prime residule increases
+iter:7,f:-2.509e+08,mu:1.148e+03,|rb|:6.366e-07,|rc|:2.277e+00,ComTime:7.630e-04
+
+Problem is unbounded.
+
+iter:0,f:3.717e+00,|rb|:8.257e+00,|rc|:1.785e+01
+dual residule increases
+iter:7,f:3.280e+00,mu:4.234e+01,|rb|:2.004e-01,|rc|:4.046e-04,ComTime:5.888e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-4.701e+00,|rb|:2.233e+01,|rc|:1.288e+01
+prime residule increases
+iter:6,f:-2.474e+10,mu:1.705e+04,|rb|:1.432e-04,|rc|:3.287e+00,ComTime:6.472e-04
+
+Problem is unbounded.
+
+iter:0,f:3.501e+00,|rb|:2.165e+01,|rc|:1.385e+01
+dual residule increases
+iter:8,f:1.682e+01,mu:6.461e+02,|rb|:2.194e+00,|rc|:2.778e-07,ComTime:9.794e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-2.889e+00,|rb|:1.022e+01,|rc|:6.500e+00
+prime residule increases
+iter:9,f:-1.897e+08,mu:1.643e+01,|rb|:4.043e-06,|rc|:6.403e-01,ComTime:4.582e-04
+
+Problem is unbounded.
+
+iter:0,f:-8.552e-01,|rb|:5.261e+00,|rc|:1.736e+01
+prime residule increases
+iter:6,f:-3.887e+08,mu:4.216e+02,|rb|:1.120e-06,|rc|:2.273e+00,ComTime:2.930e-04
+
+Problem is unbounded.
+
+iter:0,f:3.410e+00,|rb|:7.237e+00,|rc|:1.159e+01
+dual residule increases
+iter:7,f:1.629e+00,mu:5.896e+01,|rb|:1.838e-01,|rc|:1.585e-07,ComTime:2.983e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-2.035e+00,|rb|:1.079e+01,|rc|:1.087e+01
+prime residule increases
+iter:8,f:-7.437e+08,mu:9.900e+01,|rb|:1.701e-06,|rc|:9.562e-01,ComTime:3.039e-04
+
+Problem is unbounded.
+
+iter:0,f:3.697e+00,|rb|:1.312e+01,|rc|:1.472e+01
+dual residule increases
+iter:9,f:4.446e-01,mu:1.594e+03,|rb|:2.514e+00,|rc|:1.518e-07,ComTime:3.266e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-4.470e+00,|rb|:1.104e+01,|rc|:1.636e+01
+prime residule increases
+iter:6,f:-2.569e+12,mu:2.869e+04,|rb|:5.485e-04,|rc|:4.027e+00,ComTime:2.508e-04
+
+Problem is unbounded.
+
+iter:0,f:-2.074e+00,|rb|:9.403e+00,|rc|:1.045e+01
+dual residule increases
+iter:6,f:-1.362e+00,mu:1.208e+03,|rb|:2.432e+00,|rc|:1.426e-06,ComTime:2.489e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:1.853e+00,|rb|:1.443e+01,|rc|:1.372e+01
+dual residule increases
+iter:7,f:6.462e-01,mu:2.014e+04,|rb|:2.667e+00,|rc|:3.002e+01,ComTime:5.414e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:8.885e+00,|rb|:1.366e+01,|rc|:1.083e+01
+success
+iter:7,f:4.847e+00,mu:3.741e-08,|rb|:4.812e-11,|rc|:5.352e-11,ComTime:8.293e-04
+
+Optimal solution found.
+
+iter:0,f:-5.426e+00,|rb|:3.349e+01,|rc|:1.815e+01
+dual residule increases
+iter:7,f:-5.927e-01,mu:3.376e+04,|rb|:3.965e+00,|rc|:5.397e-03,ComTime:2.816e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:3.950e+00,|rb|:1.582e+01,|rc|:1.584e+01
+ill-conditioned in the linear system
+iter:6,f:-1.385e+00,mu:6.788e+04,|rb|:4.032e+00,|rc|:1.390e-08,ComTime:1.616e-03
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-1.185e+00,|rb|:5.570e+00,|rc|:1.211e+01
+prime residule increases
+iter:9,f:-1.573e+07,mu:2.804e+02,|rb|:3.450e-07,|rc|:1.321e+00,ComTime:5.533e-04
+
+Problem is unbounded.
+
+iter:0,f:3.066e+00,|rb|:7.695e+00,|rc|:9.672e+00
+success
+iter:8,f:3.460e+00,mu:1.881e-10,|rb|:4.336e-14,|rc|:2.280e-13,ComTime:3.676e-04
+
+Optimal solution found.
+
+iter:0,f:2.190e-01,|rb|:2.194e+01,|rc|:1.373e+01
+dual residule increases
+iter:6,f:3.560e+00,mu:1.085e+05,|rb|:4.349e+00,|rc|:6.633e-05,ComTime:2.396e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-2.729e+00,|rb|:5.122e+00,|rc|:1.041e+01
+prime residule increases
+iter:6,f:-4.462e+11,mu:2.230e+02,|rb|:1.290e-04,|rc|:2.845e+00,ComTime:2.540e-04
+
+Problem is unbounded.
+
+iter:0,f:1.428e+01,|rb|:1.012e+01,|rc|:9.695e+00
+success
+iter:8,f:4.339e+00,mu:4.720e-09,|rb|:2.425e-11,|rc|:1.825e-12,ComTime:3.500e-04
+
+Optimal solution found.
+
+iter:0,f:1.845e+00,|rb|:1.273e+01,|rc|:1.150e+01
+prime residule increases
+iter:6,f:-4.270e+11,mu:3.389e+03,|rb|:1.131e-04,|rc|:2.917e+00,ComTime:2.383e-04
+
+Problem is unbounded.
+
+iter:0,f:-2.928e+00,|rb|:1.763e+01,|rc|:1.593e+01
+prime residule increases
+iter:9,f:-2.980e+01,mu:4.966e+03,|rb|:1.074e+00,|rc|:5.099e-02,ComTime:3.184e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:6.857e+00,|rb|:9.459e+00,|rc|:2.150e+01
+success
+iter:8,f:-9.815e-01,mu:5.017e-09,|rb|:2.871e-14,|rc|:2.437e-11,ComTime:5.189e-04
+
+Optimal solution found.
+
+iter:0,f:2.811e+00,|rb|:1.011e+01,|rc|:9.770e+00
+prime residule increases
+iter:8,f:-1.520e+09,mu:2.032e+03,|rb|:3.580e-06,|rc|:8.900e-01,ComTime:3.420e-04
+
+Problem is unbounded.
+
+iter:0,f:-4.438e+00,|rb|:9.128e+00,|rc|:2.149e+01
+prime residule increases
+iter:11,f:-2.130e+08,mu:1.618e+05,|rb|:2.828e-06,|rc|:3.831e+00,ComTime:3.898e-04
+
+Problem is unbounded.
+
+iter:0,f:-2.088e+00,|rb|:1.141e+01,|rc|:1.025e+01
+prime residule increases
+iter:8,f:-2.829e+09,mu:5.821e+02,|rb|:4.434e-05,|rc|:1.002e+00,ComTime:2.922e-04
+
+Problem is unbounded.
+
+iter:0,f:2.688e-01,|rb|:1.287e+01,|rc|:1.525e+01
+dual residule increases
+iter:6,f:-4.241e-01,mu:9.040e+00,|rb|:6.007e-01,|rc|:2.917e-07,ComTime:2.424e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-1.578e+00,|rb|:2.007e+01,|rc|:1.325e+01
+prime residule increases
+iter:6,f:-1.007e+10,mu:4.547e+03,|rb|:3.722e-06,|rc|:2.854e+00,ComTime:2.443e-04
+
+Problem is unbounded.
+
+iter:0,f:2.808e+00,|rb|:2.054e+01,|rc|:8.471e+00
+dual residule increases
+iter:8,f:1.027e+01,mu:4.458e+02,|rb|:2.628e+00,|rc|:4.173e-05,ComTime:2.952e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:2.006e+00,|rb|:1.240e+01,|rc|:1.592e+01
+prime residule increases
+iter:9,f:-9.350e+09,mu:2.019e+03,|rb|:5.150e-06,|rc|:3.204e+00,ComTime:3.204e-04
+
+Problem is unbounded.
+
+iter:0,f:-1.302e+01,|rb|:3.753e+01,|rc|:1.807e+01
+dual residule increases
+iter:6,f:-1.702e+00,mu:1.422e+04,|rb|:9.625e+00,|rc|:3.876e-04,ComTime:2.453e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-5.243e+00,|rb|:9.125e+00,|rc|:1.801e+01
+prime residule increases
+iter:7,f:-1.553e+12,mu:7.512e+03,|rb|:9.469e-04,|rc|:1.716e+00,ComTime:5.245e-04
+
+Problem is unbounded.
+
+iter:0,f:-2.700e+00,|rb|:7.930e+00,|rc|:8.483e+00
+success
+iter:8,f:1.197e+00,mu:5.677e-09,|rb|:2.195e-14,|rc|:1.479e-11,ComTime:3.187e-04
+
+Optimal solution found.
+
+iter:0,f:4.454e-02,|rb|:1.057e+01,|rc|:6.641e+00
+prime residule increases
+iter:8,f:-2.219e+08,mu:2.044e+01,|rb|:2.731e-04,|rc|:1.564e-01,ComTime:2.963e-04
+
+Problem is unbounded.
+
+iter:0,f:-1.215e+00,|rb|:1.090e+01,|rc|:1.596e+01
+prime residule increases
+iter:7,f:-1.599e+07,mu:2.578e+02,|rb|:2.461e-07,|rc|:2.813e+00,ComTime:2.658e-04
+
+Problem is unbounded.
+
+iter:0,f:3.628e+00,|rb|:1.010e+01,|rc|:1.353e+01
+prime residule increases
+iter:9,f:-6.388e+08,mu:1.759e+03,|rb|:4.244e-06,|rc|:1.489e+00,ComTime:3.180e-04
+
+Problem is unbounded.
+
+iter:0,f:-6.711e+00,|rb|:1.731e+01,|rc|:9.990e+00
+ill-conditioned in the linear system
+iter:7,f:-3.513e+00,mu:6.368e+03,|rb|:2.467e+00,|rc|:2.117e-09,ComTime:9.194e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-1.902e+00,|rb|:1.110e+01,|rc|:1.564e+01
+ill-conditioned in the linear system
+iter:8,f:-4.820e+00,mu:4.489e+07,|rb|:1.422e+00,|rc|:1.235e-04,ComTime:7.983e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-8.967e-01,|rb|:1.257e+01,|rc|:1.304e+01
+prime residule increases
+iter:7,f:-3.881e+10,mu:3.947e+03,|rb|:1.858e-04,|rc|:1.211e+00,ComTime:2.639e-04
+
+Problem is unbounded.
+
+iter:0,f:1.602e+00,|rb|:1.359e+01,|rc|:1.394e+01
+dual residule increases
+iter:6,f:1.180e+00,mu:5.379e+02,|rb|:2.960e+00,|rc|:2.699e-07,ComTime:2.378e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-4.600e+00,|rb|:8.339e+00,|rc|:1.647e+01
+prime residule increases
+iter:7,f:-1.083e+13,mu:3.017e+04,|rb|:1.030e-02,|rc|:3.735e+00,ComTime:2.620e-04
+
+Problem is unbounded.
+
+iter:0,f:-4.966e+00,|rb|:5.965e+00,|rc|:7.075e+00
+prime residule increases
+iter:7,f:-9.615e+08,mu:4.583e+03,|rb|:1.071e-06,|rc|:1.626e+00,ComTime:2.684e-04
+
+Problem is unbounded.
+
+iter:0,f:-5.466e+00,|rb|:2.121e+01,|rc|:1.417e+01
+dual residule increases
+iter:7,f:-1.910e+00,mu:9.953e+04,|rb|:3.556e+00,|rc|:4.394e-04,ComTime:2.650e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-1.094e+00,|rb|:7.506e+00,|rc|:1.229e+01
+prime residule increases
+iter:9,f:-5.144e+08,mu:8.915e+02,|rb|:4.495e-04,|rc|:1.171e+00,ComTime:3.200e-04
+
+Problem is unbounded.
+
+iter:0,f:1.661e+00,|rb|:2.440e+00,|rc|:1.168e+01
+success
+iter:8,f:-5.123e+00,mu:2.172e-08,|rb|:3.103e-13,|rc|:1.782e-10,ComTime:2.896e-04
+
+Optimal solution found.
+
+iter:0,f:-1.248e+00,|rb|:1.072e+01,|rc|:1.429e+01
+dual residule increases
+iter:7,f:4.236e-01,mu:8.513e+03,|rb|:5.397e-01,|rc|:1.438e-04,ComTime:2.602e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-6.327e+00,|rb|:9.491e+00,|rc|:1.253e+01
+prime residule increases
+iter:7,f:-4.720e+10,mu:4.208e+04,|rb|:8.776e-06,|rc|:3.159e+00,ComTime:2.667e-04
+
+Problem is unbounded.
+
+iter:0,f:9.692e-01,|rb|:9.085e+00,|rc|:1.172e+01
+dual residule increases
+iter:6,f:1.331e+00,mu:3.640e+04,|rb|:2.754e+00,|rc|:2.688e-05,ComTime:2.443e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-1.705e+00,|rb|:1.642e+01,|rc|:1.829e+01
+prime residule increases
+iter:6,f:-6.827e+08,mu:1.248e+02,|rb|:1.658e-07,|rc|:2.271e+00,ComTime:2.401e-04
+
+Problem is unbounded.
+
+iter:0,f:-1.368e+00,|rb|:2.065e+01,|rc|:1.477e+01
+prime residule increases
+iter:6,f:-1.636e+13,mu:7.736e+04,|rb|:4.387e-03,|rc|:4.047e+00,ComTime:2.390e-04
+
+Problem is unbounded.
+
+iter:0,f:-4.007e+00,|rb|:1.539e+01,|rc|:1.738e+01
+ill-conditioned in the linear system
+iter:5,f:-1.253e+00,mu:1.094e+04,|rb|:2.470e+00,|rc|:2.256e-08,ComTime:3.065e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-5.170e+00,|rb|:2.294e+01,|rc|:1.128e+01
+prime residule increases
+iter:8,f:-2.013e+00,mu:2.818e+02,|rb|:8.096e-01,|rc|:4.742e-04,ComTime:2.933e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-6.265e+00,|rb|:1.423e+01,|rc|:5.787e+00
+prime residule increases
+iter:6,f:-1.570e+11,mu:5.693e+02,|rb|:8.797e-05,|rc|:1.389e+00,ComTime:2.418e-04
+
+Problem is unbounded.
+
+iter:0,f:6.653e+00,|rb|:1.051e+01,|rc|:7.648e+00
+prime residule increases
+iter:10,f:-1.207e+12,mu:1.404e+03,|rb|:5.930e-03,|rc|:2.708e-01,ComTime:3.672e-04
+
+Problem is unbounded.
+
+iter:0,f:4.353e+00,|rb|:1.236e+01,|rc|:8.497e+00
+dual residule increases
+iter:9,f:9.306e-01,mu:2.208e+03,|rb|:9.004e-01,|rc|:8.043e-07,ComTime:3.147e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:2.303e+00,|rb|:1.568e+01,|rc|:5.617e+00
+success
+iter:7,f:2.500e-01,mu:8.538e-08,|rb|:4.614e-10,|rc|:5.785e-11,ComTime:2.688e-04
+
+Optimal solution found.
+
+iter:0,f:5.797e+00,|rb|:1.865e+01,|rc|:1.040e+01
+prime residule increases
+iter:7,f:-2.080e+11,mu:4.189e+04,|rb|:3.220e-04,|rc|:1.500e+00,ComTime:2.550e-04
+
+Problem is unbounded.
+
+iter:0,f:-6.175e+00,|rb|:1.976e+01,|rc|:5.130e+00
+dual residule increases
+iter:12,f:3.810e+00,mu:9.006e+04,|rb|:3.701e+00,|rc|:3.072e-03,ComTime:5.626e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-2.259e+00,|rb|:1.250e+01,|rc|:1.023e+01
+dual residule increases
+iter:9,f:-5.036e-01,mu:1.189e+03,|rb|:2.481e+00,|rc|:3.913e-06,ComTime:3.596e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:4.261e-01,|rb|:5.584e+00,|rc|:1.110e+01
+prime residule increases
+iter:6,f:-2.481e+10,mu:3.522e+03,|rb|:7.547e-06,|rc|:2.054e+00,ComTime:3.213e-04
+
+Problem is unbounded.
+
+iter:0,f:9.383e-01,|rb|:4.553e+00,|rc|:6.186e+00
+prime residule increases
+iter:6,f:-7.355e+08,mu:4.161e+02,|rb|:2.014e-06,|rc|:1.139e+00,ComTime:2.685e-04
+
+Problem is unbounded.
+
+iter:0,f:1.501e+00,|rb|:1.045e+01,|rc|:1.677e+01
+prime residule increases
+iter:7,f:-1.137e+15,mu:4.826e+03,|rb|:1.066e-01,|rc|:3.521e+00,ComTime:2.930e-04
+
+Problem is unbounded.
+
+iter:0,f:8.857e+00,|rb|:2.471e+01,|rc|:1.343e+01
+dual residule increases
+iter:9,f:8.655e+00,mu:9.248e+01,|rb|:3.444e-01,|rc|:1.671e-06,ComTime:3.360e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-7.143e-01,|rb|:1.799e+01,|rc|:1.261e+01
+prime residule increases
+iter:7,f:-2.013e+09,mu:4.173e+03,|rb|:1.519e-06,|rc|:2.852e+00,ComTime:3.920e-04
+
+Problem is unbounded.
+
+iter:0,f:1.065e+00,|rb|:1.333e+01,|rc|:1.067e+01
+dual residule increases
+iter:6,f:8.281e-01,mu:1.741e+03,|rb|:1.647e+00,|rc|:1.436e-06,ComTime:3.107e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:5.677e+00,|rb|:7.481e+00,|rc|:1.437e+01
+success
+iter:7,f:2.322e+00,mu:4.963e-08,|rb|:1.019e-11,|rc|:1.614e-15,ComTime:2.896e-04
+
+Optimal solution found.
+
+iter:0,f:7.788e+00,|rb|:1.590e+01,|rc|:7.275e+00
+prime residule increases
+iter:7,f:9.815e-01,mu:2.176e+03,|rb|:6.486e+00,|rc|:3.140e-03,ComTime:2.708e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:7.213e-01,|rb|:4.621e+00,|rc|:9.714e+00
+prime residule increases
+iter:9,f:-1.356e+05,mu:6.282e+00,|rb|:2.800e-06,|rc|:5.274e-01,ComTime:3.556e-04
+
+Problem is unbounded.
+
+iter:0,f:2.615e+00,|rb|:1.476e+01,|rc|:9.404e+00
+success
+iter:9,f:1.828e-02,mu:1.662e-10,|rb|:2.797e-14,|rc|:8.212e-14,ComTime:3.291e-04
+
+Optimal solution found.
+
+iter:0,f:-3.057e+00,|rb|:1.453e+01,|rc|:1.773e+01
+dual residule increases
+iter:8,f:-7.164e-01,mu:4.839e+01,|rb|:3.412e-01,|rc|:1.046e-06,ComTime:2.982e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:5.284e+00,|rb|:1.164e+01,|rc|:1.781e+01
+prime residule increases
+iter:6,f:8.786e-01,mu:6.286e+02,|rb|:1.827e+00,|rc|:6.754e-04,ComTime:2.544e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:5.890e-01,|rb|:1.156e+01,|rc|:2.041e+01
+prime residule increases
+iter:7,f:-1.377e+11,mu:4.633e+04,|rb|:6.786e-05,|rc|:2.326e+00,ComTime:2.806e-04
+
+Problem is unbounded.
+
+iter:0,f:-2.487e+00,|rb|:4.043e+01,|rc|:1.493e+01
+success
+iter:8,f:-5.028e+00,mu:1.360e-09,|rb|:8.007e-13,|rc|:3.556e-13,ComTime:3.328e-04
+
+Optimal solution found.
+
+iter:0,f:1.824e+00,|rb|:7.744e+00,|rc|:1.455e+01
+prime residule increases
+iter:7,f:-9.519e+08,mu:2.266e+03,|rb|:3.200e-07,|rc|:3.409e+00,ComTime:3.202e-04
+
+Problem is unbounded.
+
+iter:0,f:1.483e+00,|rb|:1.484e+01,|rc|:1.200e+01
+dual residule increases
+iter:7,f:1.461e+00,mu:2.926e+02,|rb|:4.120e+00,|rc|:1.030e-05,ComTime:2.765e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:7.404e+00,|rb|:9.195e+00,|rc|:1.438e+01
+prime residule increases
+iter:6,f:-2.244e+09,mu:2.799e+02,|rb|:9.514e-07,|rc|:2.074e+00,ComTime:2.516e-04
+
+Problem is unbounded.
+
+iter:0,f:2.465e+00,|rb|:1.424e+01,|rc|:2.318e+01
+prime residule increases
+iter:7,f:-1.997e+08,mu:2.358e+01,|rb|:9.270e-07,|rc|:7.879e-01,ComTime:2.656e-04
+
+Problem is unbounded.
+
+iter:0,f:-4.529e+00,|rb|:2.173e+01,|rc|:2.740e+01
+dual residule increases
+iter:7,f:2.054e+00,mu:2.964e+04,|rb|:2.792e+00,|rc|:1.985e-03,ComTime:2.648e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:4.859e-01,|rb|:1.647e+01,|rc|:1.133e+01
+prime residule increases
+iter:9,f:-5.274e+14,mu:9.783e+02,|rb|:1.469e-01,|rc|:1.419e+00,ComTime:3.203e-04
+
+Problem is unbounded.
+
+iter:0,f:-5.581e-01,|rb|:2.005e+01,|rc|:1.217e+01
+dual residule increases
+iter:7,f:-3.582e+00,mu:5.811e+01,|rb|:1.702e+00,|rc|:2.200e-06,ComTime:2.624e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:1.389e+01,|rb|:1.808e+01,|rc|:3.479e+00
+success
+iter:7,f:2.079e+00,mu:1.571e-08,|rb|:4.315e-10,|rc|:1.624e-11,ComTime:2.602e-04
+
+Optimal solution found.
+
+iter:0,f:1.090e+00,|rb|:7.087e+00,|rc|:7.631e+00
+prime residule increases
+iter:7,f:-1.290e+15,mu:1.327e+03,|rb|:1.370e+00,|rc|:5.399e-01,ComTime:2.603e-04
+
+Problem is unbounded.
+
+iter:0,f:-1.984e+01,|rb|:4.923e+01,|rc|:1.012e+01
+dual residule increases
+iter:8,f:-5.223e+00,mu:1.302e+04,|rb|:4.560e+00,|rc|:5.080e-05,ComTime:2.935e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:1.616e+00,|rb|:8.223e+00,|rc|:1.270e+01
+prime residule increases
+iter:6,f:-5.617e+10,mu:6.277e+02,|rb|:7.034e-05,|rc|:1.861e+00,ComTime:2.372e-04
+
+Problem is unbounded.
+
+iter:0,f:-2.649e+00,|rb|:1.917e+01,|rc|:1.718e+01
+dual residule increases
+iter:8,f:-1.025e+00,mu:6.017e+04,|rb|:3.592e+00,|rc|:4.307e-04,ComTime:2.910e-04
+
+No feasible solution found.
+
+Linprog stopped because no point satisfies the constraints.
+
+iter:0,f:-2.835e+00,|rb|:5.705e+00,|rc|:1.773e+01
+prime residule increases
+iter:7,f:-1.253e+09,mu:1.940e+03,|rb|:3.655e-06,|rc|:2.742e+00,ComTime:2.627e-04
+
+Problem is unbounded.
+
+iter:0,f:3.536e+00,|rb|:7.893e+00,|rc|:1.191e+01
+prime residule increases
+iter:9,f:-6.973e+05,mu:1.295e+02,|rb|:1.786e-05,|rc|:1.280e+00,ComTime:3.189e-04
+
+Problem is unbounded.
+
+iter:0,f:-1.442e+01,|rb|:2.827e+01,|rc|:9.445e+00
+success
+iter:9,f:-1.357e+01,mu:2.382e-10,|rb|:1.169e-12,|rc|:8.531e-15,ComTime:3.185e-04
+
+Optimal solution found.
+
+iter:0,f:5.181e+00,|rb|:1.264e+01,|rc|:1.259e+01
+prime residule increases
+iter:7,f:-8.596e+09,mu:2.109e+03,|rb|:3.119e-05,|rc|:1.765e+00,ComTime:2.571e-04
+
+Problem is unbounded.
+
+iter:0,f:2.083e+00,|rb|:6.578e+00,|rc|:8.922e+00
+prime residule increases
+iter:6,f:-1.647e+10,mu:3.887e+01,|rb|:2.229e-05,|rc|:6.513e-01,ComTime:2.472e-04
+
+Problem is unbounded.
+
+iter:0,f:-1.596e+00,|rb|:6.964e+00,|rc|:7.633e+00
+success
+iter:7,f:-4.492e+00,mu:3.535e-08,|rb|:4.920e-12,|rc|:3.903e-10,ComTime:2.664e-04
+
+Optimal solution found.
+
+The number of optimal solution founded: 14
+The number of feasible empty set:       39
+The number of solution unbounded:       47
+-----------------------------------------
+The number of optimal solution founded:   14
+The number of max iteration reached:      0
+The number of optimal solution unbounded: 0
+The number of prime resifule increased:   51
+The number of dual resifule increased:    31
+The number of ill-conditioned:            4
+</pre><h2 id="2">compare the performance with Matlab build-in function</h2><pre class="codeinput">studentnumber = 1153389;
+num = 10; m = 300; n = 500;
+params.verbose = 1;
+avg_time_LinProgIP = 0;
+avg_time_linprog = 0;
+diff_of_min_values = 0;
+<span class="keyword">for</span> i = 1 : num
+    seed = studentnumber + i;
+    rng(seed);
+
+    x = randn (n,1) ; x(x &lt; 0) = 0;
+    A = randn(m,n);
+    b = A * x;
+    c = randn(n,1);
+    [~, info] = LinProgIP(c, A, b, params);
+    avg_time_LinProgIP = avg_time_linprog + info.ComTime;
+
+    tic;
+    [~, fval] = linprog(c, [], [], A, b, zeros(1, n), []);
+    time = toc;
+    avg_time_linprog = avg_time_linprog + time;
+
+    diff_of_min_values = diff_of_min_values + abs(info.fvs-fval);
+<span class="keyword">end</span>
+avg_time_LinProgIP = avg_time_LinProgIP / num;
+avg_time_linprog = avg_time_linprog / num;
+diff_of_min_values = diff_of_min_values / num;
+
+fprintf(<span class="string">"========================================================\n"</span>);
+fprintf(<span class="string">"compare the performance with Matlab build-in function  \n"</span>);
+fprintf(<span class="string">"========================================================\n"</span>);
+fprintf(<span class="string">"average time of function linProgIP   : %fs\n"</span>, avg_time_LinProgIP);
+fprintf(<span class="string">"avg time of built-in function linprog: %fs\n"</span>, avg_time_linprog);
+fprintf(<span class="string">"difference between minimum values    : %.6e\n"</span>, diff_of_min_values);
+fprintf(<span class="string">"========================================================\n"</span>);
+</pre><pre class="codeoutput">iter:0,f:2.789e+01,|rb|:8.335e+02,|rc|:9.146e+01
+success
+iter:13,f:-1.049e+02,mu:3.198e-10,|rb|:1.208e-10,|rc|:2.539e-14,ComTime:5.054e-02
+
+Optimal solution found.
+
+iter:0,f:2.483e+00,|rb|:1.037e+03,|rc|:8.002e+01
+success
+iter:13,f:-8.327e+01,mu:9.241e-12,|rb|:3.325e-10,|rc|:2.399e-14,ComTime:4.284e-02
+
+Optimal solution found.
+
+iter:0,f:8.654e+01,|rb|:8.851e+02,|rc|:9.837e+01
+success
+iter:12,f:-8.964e+01,mu:1.221e-10,|rb|:3.610e-11,|rc|:2.414e-14,ComTime:3.884e-02
+
+Optimal solution found.
+
+iter:0,f:4.709e+01,|rb|:7.935e+02,|rc|:9.067e+01
+success
+iter:14,f:-2.953e+01,mu:2.477e-12,|rb|:6.789e-10,|rc|:2.645e-14,ComTime:4.533e-02
+
+Optimal solution found.
+
+iter:0,f:-2.917e+00,|rb|:7.933e+02,|rc|:8.150e+01
+success
+iter:13,f:-9.919e+01,mu:1.804e-10,|rb|:4.260e-09,|rc|:2.019e-14,ComTime:4.254e-02
+
+Optimal solution found.
+
+iter:0,f:-2.153e+01,|rb|:8.059e+02,|rc|:9.022e+01
+success
+iter:12,f:-1.024e+02,mu:5.003e-10,|rb|:6.860e-11,|rc|:2.892e-14,ComTime:3.870e-02
+
+Optimal solution found.
+
+iter:0,f:3.694e+01,|rb|:6.707e+02,|rc|:1.181e+02
+success
+iter:14,f:-1.168e+02,mu:5.167e-09,|rb|:1.478e-10,|rc|:2.154e-14,ComTime:4.374e-02
+
+Optimal solution found.
+
+iter:0,f:4.014e+01,|rb|:8.887e+02,|rc|:8.963e+01
+success
+iter:12,f:-1.168e+02,mu:4.199e-11,|rb|:1.114e-09,|rc|:2.218e-14,ComTime:4.061e-02
+
+Optimal solution found.
+
+iter:0,f:-9.937e+01,|rb|:8.007e+02,|rc|:8.325e+01
+success
+iter:13,f:-1.181e+02,mu:6.340e-11,|rb|:2.374e-09,|rc|:2.240e-14,ComTime:4.146e-02
+
+Optimal solution found.
+
+iter:0,f:1.451e+02,|rb|:1.009e+03,|rc|:9.016e+01
+success
+iter:14,f:-5.752e+01,mu:6.530e-11,|rb|:4.255e-10,|rc|:1.880e-14,ComTime:4.407e-02
+
+Optimal solution found.
+
+========================================================
+compare the performance with Matlab build-in function  
+========================================================
+average time of function linProgIP   : 0.364323s
+avg time of built-in function linprog: 0.399063s
+difference between minimum values    : 3.180602e-11
+========================================================
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Numerical Optimization
+% 
+% *Name: Fan Jiajun,  Student number: 19020211153389* 
+%
+% _1, by the output results, it suggested that two methods can both
+% find optimal solution while solution existed._
+%
+% _2, it showed that interior point method is better than simplex method 
+% by comparing time spent between the two methods. It also suggested that 
+% optimal values is almostly equivalent._
+%
+
+clc; close all; clearvars;
+
+studentnumber = 1153389;
+
+m = 10; n = 20;
+num = 100;
+
+params.verbose = 1;
+params.OutputGap = 10;      
+params.Max_Iteration = 100;
+params.Tolerance = 1e-7;
+params.Decomposition = "qr";
+
+num_of_empty_feasible_set = 0;
+num_of_unbounded = 0;
+num_of_solution_exist = 0;
+
+case0 = 0; case1 = 0; case2 = 0; 
+case3 = 0; case4 = 0; case5 = 0;
+
+for i = 1 : num
+    seed = studentnumber + i;
+    rng(seed);
+
+    x = rand(n, 1); A = randn(m, n);
+    b = randn(m, 1); c = randn(n, 1); 
+    [~, info] = LinProgIP(c, A, b, params);
+    [~, fval, exitflag, ~] = linprog(c, [], [], A, b, zeros(1, n), []);
+
+    switch exitflag
+        case 1
+            num_of_solution_exist = num_of_solution_exist + 1;
+        case -2
+            num_of_empty_feasible_set = num_of_empty_feasible_set  + 1;
+        case -3
+            num_of_unbounded = num_of_unbounded + 1;  
+    end     
+
+    switch info.status
+        case 0 
+            case0 = case0 + 1;
+        case 1
+            case1 = case1 + 1;
+        case 2
+            case2 = case2 + 1;
+        case 3
+            case3 = case3 + 1;
+        case 4
+            case4 = case4 + 1;
+        case 5
+            case5 = case5 + 1;
+    end
+end
+
+fprintf("The number of optimal solution founded: %d\n", num_of_solution_exist);
+fprintf("The number of feasible empty set:       %d\n", num_of_empty_feasible_set);
+fprintf("The number of solution unbounded:       %d\n", num_of_unbounded);
+fprintf("REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-\n");
+
+fprintf("The number of optimal solution founded:   %d\n", case0);
+fprintf("The number of max iteration reached:      %d\n", case1);
+fprintf("The number of optimal solution unbounded: %d\n", case2);
+fprintf("The number of prime resifule increased:   %d\n", case3);
+fprintf("The number of dual resifule increased:    %d\n", case4);
+fprintf("The number of ill-conditioned:            %d\n", case5);
+
+% fprintf("=============================================\n");
+% fprintf("       Record of function results            \n");
+% fprintf("=============================================\n");
+% fprintf("amount of empty feasible set: %d\n", num_of_empty_feasible_set);
+% fprintf("amount of unbounded         : %d\n", num_of_unbounded);
+% fprintf("amount of solution exists   : %d\n", num_of_solution_exist);
+% fprintf("=============================================\n");
+
+%% compare the performance with Matlab build-in function
+
+studentnumber = 1153389;
+num = 10; m = 300; n = 500;
+params.verbose = 1;
+avg_time_LinProgIP = 0;
+avg_time_linprog = 0;
+diff_of_min_values = 0;
+for i = 1 : num
+    seed = studentnumber + i;
+    rng(seed);
+    
+    x = randn (n,1) ; x(x < 0) = 0;
+    A = randn(m,n);
+    b = A * x;
+    c = randn(n,1);
+    [~, info] = LinProgIP(c, A, b, params);
+    avg_time_LinProgIP = avg_time_linprog + info.ComTime;
+
+    tic;
+    [~, fval] = linprog(c, [], [], A, b, zeros(1, n), []);
+    time = toc;
+    avg_time_linprog = avg_time_linprog + time;
+    
+    diff_of_min_values = diff_of_min_values + abs(info.fvs-fval);
+end
+avg_time_LinProgIP = avg_time_LinProgIP / num;
+avg_time_linprog = avg_time_linprog / num;
+diff_of_min_values = diff_of_min_values / num;
+
+fprintf("========================================================\n");
+fprintf("compare the performance with Matlab build-in function  \n");
+fprintf("========================================================\n");
+fprintf("average time of function linProgIP   : %fs\n", avg_time_LinProgIP);
+fprintf("avg time of built-in function linprog: %fs\n", avg_time_linprog);
+fprintf("difference between minimum values    : %.6e\n", diff_of_min_values);
+fprintf("========================================================\n");
+##### SOURCE END #####
+--></body></html>
